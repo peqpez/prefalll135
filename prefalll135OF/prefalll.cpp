@@ -7,11 +7,11 @@ using namespace MSA;
 void prefalll::setup() {
 
     initMills();   //create an object of the class Mill for every mill
-
     ofHideCursor();
-    calibra=false;
+    calibration=false;
 
-    for (int i=0; i<NUM; i++) {  // create the flock of fish
+    // create the flock of fish
+    for (int i=0; i<NUM; i++) {  
         flock[i].init( ofRandom(0,ofGetWidth()), ofRandom(0,ofGetHeight()), 2, ofRandom(0,PI), ofRandom(2.0,6.0) );
         flock[i].setSpeedLimit( ofRandom(0.3,0.5), 0.7);
         int c=(int)ofRandom(100,200);
@@ -184,7 +184,7 @@ void prefalll::draw(){
         }
     }
 
-    if (calibra) { //if calibration mode is selected(key'c') show the position of the mills
+    if (calibration) { //if calibration mode is selected(key'c') show the position of the mills
         //draw a circle at the position of each mill to help calibration
         ofColor(255,0,0);
         ofCircle( 162,177,15);
@@ -234,7 +234,9 @@ void prefalll::addToFluid( int id, Vec2f pos, Vec2f vel, bool addColor, bool add
 void prefalll::windowResized(int w, int h) {}
 
 
-void prefalll::keyPressed  (int key){
+
+void prefalll::keyPressed(int key){
+    //keyboard shortcuts	
     switch(key) {
         case '0':
           for (int i=0; i<NUM; i++) {
@@ -277,13 +279,12 @@ void prefalll::keyPressed  (int key){
             fluidSolver.reset();
             break;
 
-
 	case 'c':
-            calibra=!calibra;
+            calibration=!calibration;
             break;
 
 	case 'C':
-            calibra=!calibra;
+            calibration=!calibration;
             break;
 
 	case 'b': {
