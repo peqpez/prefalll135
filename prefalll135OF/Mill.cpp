@@ -1,4 +1,3 @@
-
 #include "ofMain.h"
 #include "Mill.h"
 
@@ -26,7 +25,6 @@ void Mill::init(float mx, float my, string mpath){
 
 
 void Mill::draw(){
-    // millImg.draw(x,y);
     n=4/vel;
     ofEnableAlphaBlending();
     ofFill();
@@ -37,16 +35,12 @@ void Mill::draw(){
         ofRotateZ(rot*vel);
         millImg.draw(0-width*scale/2,0-height*scale/2, width*scale,height*scale);
         ofPopMatrix();
-        //ofSetColor(100,100,100,100);
+        
     }
     else {
-        //ofSetColor(200,200,200,100);
         millImg.draw(x,y,width*scale,height*scale);
-
     }
     ofDisableAlphaBlending();
-
-    //ofCircle(x,y,50);
 
 }
 
