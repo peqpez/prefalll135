@@ -20,20 +20,20 @@ void prefalll::setup() {
     }
 
 
-	// setup fluid parameters
-	fluidSolver.setup(100, 100);
+    // setup fluid parameters
+    fluidSolver.setup(100, 100);
     fluidSolver.enableRGB(true).setFadeSpeed(0.007).setDeltaT(0.2).setVisc(0.0002).setColorDiffusion(0);
-	fluidDrawer.setup( &fluidSolver );
-	fluidDrawer.setDrawMode(MSA::kFluidDrawSpeed);
-	fluidCellsX			= 150;
-	drawFluid			= true;
-	drawParticles		= false;
-    resizeFluid			= true;
+    fluidDrawer.setup( &fluidSolver );
+    fluidDrawer.setDrawMode(MSA::kFluidDrawSpeed);
+    fluidCellsX	= 150;
+    drawFluid = true;
+    drawParticles = false;
+    resizeFluid	= true;
 
 
 
     //setup the connection with arduino
-	status=arduino.connect("COM5",57600); // arduino connected at serial port COM5
+    status=arduino.connect("COM5",57600); // arduino connected at serial port COM5
     bSetupArduino=false;
     for(i=0;i<9;i++) {
         arduino.sendAnalogPinReporting(i,ARD_ANALOG) ;  //using analog pins 0-9 of arduino mega
@@ -41,19 +41,18 @@ void prefalll::setup() {
 
 
     // setup the connection with PD
-	sender.setup( HOST, PORT );
+    sender.setup( HOST, PORT );
     label[0]="/vel0"; label[1]="/vel1"; label[2]="/vel2"; label[3]="/vel3";  // the OSC labels send to PD for each mill
     label[4]="/vel4"; label[5]="/vel5";label[6]="/vel6"; label[7]="/vel7"; label[8]="/vel8";
 
 
-
     ofSetFrameRate(60);
-	ofBackground(0, 0, 0);
-	ofSetVerticalSync(false);
+    ofBackground(0, 0, 0);
+    ofSetVerticalSync(false);
     windowResized(ofGetWidth(), ofGetHeight());
-	pMouse = getWindowCenter();
+    pMouse = getWindowCenter();
     ofEnableAlphaBlending();
-	ofSetBackgroundAuto(false);
+    ofSetBackgroundAuto(false);
 }
 
 
@@ -63,20 +62,19 @@ void prefalll::setup() {
 void prefalll::update(){
 
     //update fluids
-	if(resizeFluid) 	{
-		fluidSolver.setSize(fluidCellsX, fluidCellsX / getWindowAspectRatio() );
-		fluidDrawer.setup(&fluidSolver);
-		resizeFluid = false;
-	}
+    if(resizeFluid) 	{
+	fluidSolver.setSize(fluidCellsX, fluidCellsX / getWindowAspectRatio() );
+	fluidDrawer.setup(&fluidSolver);
+	resizeFluid = false;
+    }
 
     fluidSolver.update();
 
-
     //update arduino
-	arduino.update();
+    arduino.update();
 
     //iterration for the 8 mills (8 arduino PINs)
-     for(i=0;i<9;i++){
+     for(i=0;i<MNUM;i++){
         val0=arduino.getAnalog(i);   //Reading data from Arduino's Analog PIN i
         mills[i].valPre=mills[i].valCur; //mills[i].valPre is the PREVIOUS VALUE that arduino sent for MIIL i
         mills[i].valCur=val0;           // mills[i].valCur is the CURRENT VALUE that arduino sent for MIIL i
@@ -113,9 +111,9 @@ void prefalll::update(){
         m.addFloatArg( pd );
         sender.sendMessage( m );
 
-		}
+    }
 
-        arduino.setUseDelay(true);
+    arduino.setUseDelay(true);
 
 }
 
@@ -124,12 +122,12 @@ void prefalll::update(){
 void prefalll::draw(){
 
     //Draw Fluids
-	if( drawFluid ) {
-		glColor3f(1, 1, 1);
-		fluidDrawer.draw(0, 0, getWindowWidth(), getWindowHeight());
-	} else {
-		if(getElapsedFrames()%5==0) fadeToColor( 0, 0, 0, 0.1f );
-	}
+    if( drawFluid ) {
+	glColor3f(1, 1, 1);
+	fluidDrawer.draw(0, 0, getWindowWidth(), getWindowHeight());
+    } else {
+	if(getElapsedFrames()%5==0) fadeToColor( 0, 0, 0, 0.1f );
+    }
 
     ofNoFill();
 
@@ -214,21 +212,20 @@ void prefalll::fadeToColor(float r, float g, float b, float speed) {
 void prefalll::addToFluid( int id, Vec2f pos, Vec2f vel, bool addColor, bool addForce ) {
     float speed = vel.x * vel.x  + vel.y * vel.y * getWindowAspectRatio() * getWindowAspectRatio();    // balance the x and y components of speed with the screen aspect ratio
     if(speed > 0) {
-		pos.x = constrain(pos.x, 0.0f, 1.0f);
-		pos.y = constrain(pos.y, 0.0f, 1.0f);
+	pos.x = constrain(pos.x, 0.0f, 1.0f);
+	pos.y = constrain(pos.y, 0.0f, 1.0f);
 
         const float colorMult = 100;
         const float velocityMult = 30;
 
         int index = fluidSolver.getIndexForPos(pos);
 
-		if(addColor) {
-			Color drawColor( CM_HSV, 0.6, 1, 2 );
-			fluidSolver.addColorAtIndex(index, drawColor * colorMult);
-		}
+	if(addColor) {
+		Color drawColor( CM_HSV, 0.6, 1, 2 );
+		fluidSolver.addColorAtIndex(index, drawColor * colorMult);
+	}
 
-		if(addForce)
-			fluidSolver.addForceAtIndex(index, vel * velocityMult);
+	if(addForce) fluidSolver.addForceAtIndex(index, vel * velocityMult);
 
     }
 }
@@ -240,64 +237,64 @@ void prefalll::windowResized(int w, int h) {}
 void prefalll::keyPressed  (int key){
     switch(key) {
         case '0':
-         for (int i=0; i<NUM; i++) {
+          for (int i=0; i<NUM; i++) {
             flock[i].init( ofRandom(0,ofGetWidth()), ofRandom(0,ofGetHeight()), 2, ofRandom(0,PI), ofRandom(2.0,6.0) );
             flock[i].setSpeedLimit( ofRandom(0.3,0.5), 0.7);
             int c=(int)ofRandom(100,200);
             flock[i].setColor( c, 0, 0 );
             flock[i].initColor(c,0,0);
+           }
+           break;
+	case '1':
+            fluidDrawer.setDrawMode(MSA::kFluidDrawColor);
+            break;
 
-        }break;
-		case '1':
-			fluidDrawer.setDrawMode(MSA::kFluidDrawColor);
-			break;
+	case '2':
+            fluidDrawer.setDrawMode(MSA::kFluidDrawMotion);
+            break;
 
-		case '2':
-			fluidDrawer.setDrawMode(MSA::kFluidDrawMotion);
-			break;
+	case '3':
+            fluidDrawer.setDrawMode(MSA::kFluidDrawSpeed);
+            break;
 
-		case '3':
-			fluidDrawer.setDrawMode(MSA::kFluidDrawSpeed);
-			break;
+	case '4':
+            fluidDrawer.setDrawMode(MSA::kFluidDrawVectors);
+            break;
 
-		case '4':
-			fluidDrawer.setDrawMode(MSA::kFluidDrawVectors);
-			break;
+	case 'd':
+            drawFluid ^= true;
+            break;
 
-		case 'd':
-			drawFluid ^= true;
-			break;
+	case 'p':
+            drawParticles ^= true;
+            break;
 
-		case 'p':
-			drawParticles ^= true;
-			break;
+	case 'f':
+            ofToggleFullscreen();
+            break;
 
-		case 'f':
-			ofToggleFullscreen();
-			break;
-
-		case 'r':
-			fluidSolver.reset();
-			break;
+	case 'r':
+            fluidSolver.reset();
+            break;
 
 
-			case 'c':
-			calibra=!calibra;
-			break;
+	case 'c':
+            calibra=!calibra;
+            break;
 
-			case 'C':
-			calibra=!calibra;
-			break;
+	case 'C':
+            calibra=!calibra;
+            break;
 
-		case 'b': {
-			Timer timer;
-			const int ITERS = 3000;
-			timer.start();
-			for( int i = 0; i < ITERS; ++i ) fluidSolver.update();
-			timer.stop();
-			//cout << ITERS << " iterations took " << timer.getSeconds() << " seconds." << std::endl;
-		}
-			break;
+	case 'b': {
+            Timer timer;
+            const int ITERS = 3000;
+            timer.start();
+            for( int i = 0; i < ITERS; ++i ) fluidSolver.update();
+            timer.stop();
+            //cout << ITERS << " iterations took " << timer.getSeconds() << " seconds." << std::endl;
+	}
+	break;
 
     }
 }
@@ -338,7 +335,7 @@ void prefalll::initMills(){ //create 8 mill objects and determinate positions
     mills[2].init(367,177,"1.png");
 
 
-     mills[3].init(162,375,"1.png");
+    mills[3].init(162,375,"1.png");
     mills[4].init(265,375,"1.png");
     mills[8].init(367,375,"1.png");
 
